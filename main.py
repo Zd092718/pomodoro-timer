@@ -1,5 +1,8 @@
 from tkinter import *
+from pygame import mixer
 import math
+
+
 
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
@@ -11,9 +14,19 @@ WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 0
+timer = None
 
 
 # ---------------------------- TIMER RESET ------------------------------- #
+
+def reset_timer():
+    window.after_cancel(timer)
+    canvas.itemconfig(timer_text, text="00:00")
+    check_mark_label.config(text="")
+    title_label.config(text="Timer", fg=GREEN)
+    global reps
+    reps = 0
+
 
 # ---------------------------- TIMER MECHANISM ------------------------------- #
 def start_timer():
@@ -36,6 +49,8 @@ def start_timer():
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 def count_down(count):
+    mixer.init()
+    sound = mixer.Sound("./hotel-bell-ding-1-174457.mp3")
     count_min = math.floor(count / 60)
     count_sec = count % 60
     if count_sec < 10:
@@ -43,9 +58,17 @@ def count_down(count):
 
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
-        window.after(1000, count_down, count - 1)
+        global timer
+        timer = window.after(1000, count_down, count - 1)
     else:
+        sound.play()
         start_timer()
+        marks = ""
+        work_sessions = math.floor(reps / 2)
+        for _ in range(work_sessions):
+            marks += "✔"
+        check_mark_label.config(text=marks)
+
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -67,11 +90,11 @@ start_button.config(text="Start", highlightthickness=0, command=start_timer)
 start_button.grid(column=0, row=2)
 
 reset_button = Button()
-reset_button.config(text="Reset", highlightthickness=0)
+reset_button.config(text="Reset", highlightthickness=0, command=reset_timer)
 reset_button.grid(column=2, row=2)
 
 check_mark_label = Label()
-check_mark_label.config(text="✔", fg=GREEN, bg=YELLOW)
+check_mark_label.config(fg=GREEN, bg=YELLOW)
 check_mark_label.grid(column=1, row=3)
 
 window.mainloop()
