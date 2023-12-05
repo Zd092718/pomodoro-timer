@@ -23,6 +23,8 @@ def start_timer():
 def count_down(count):
     count_min = math.floor(count / 60)
     count_sec = count % 60
+    if count_sec < 10:
+        count_sec = f"0{count_sec}"
 
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
@@ -49,7 +51,7 @@ start_button.config(text="Start", highlightthickness=0, command=start_timer)
 start_button.grid(column=0, row=2)
 
 reset_button = Button()
-reset_button.config(text="Start", highlightthickness=0)
+reset_button.config(text="Reset", highlightthickness=0)
 reset_button.grid(column=2, row=2)
 
 check_mark_label = Label()
